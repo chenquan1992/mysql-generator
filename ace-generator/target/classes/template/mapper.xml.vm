@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${package}.mapper.${className}Mapper">
+    <resultMap type="${package}.entity.${className}" id="${classname}Map">
+#foreach($column in $columns)
+        <result property="${column.attrname}" column="${column.columnName}"/>
+#end
+    </resultMap>
+
+    <select id="selectByQuery" resultMap="${classname}Map">
+        select * from ${tableName}
+        <where>
+#foreach($column in $columns)
+##   Date类型的数据不能判断非空
+    #if($column.attrType == "Date")
+        <if test="${column.attrname} != null ">
+            and ${column.columnName} = #{ ${column.attrname} }
+        </if>
+    #else
+        <if test="${column.attrname} != null and ${column.attrname} != ''">
+            and ${column.columnName} = #{ ${column.attrname} }
+        </if>
+    #end
+
+##            <if test="${column.attrname} != null and ${column.attrname} != ''">
+##                and ${column.columnName} = #{ ${column.attrname} }
+##            </if>
+#end
+        </where>
+#foreach ($column in $columns)
+#if($column.columnName == $pk.columnName)
+        order by $column.columnName desc
+#end
+#end
+    </select>
+
+</mapper>
